@@ -1,4 +1,4 @@
-Name: LeapMotion Plugin.
+Name: LEAPController
 Version: 0.1.3
 Type: Service Plugin
 Author: Zachary Freiberg - Kiwi.js Team
@@ -191,4 +191,4 @@ Take Note!
 TODO:
 --------------------------------------------
 
-
+Sectors for hand detection and multiplayer

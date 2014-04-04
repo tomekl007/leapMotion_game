@@ -1,3 +1,6 @@
+LEAPController
+========================================================
+
 Name: LeapMotion Plugin.
 Version: 0.1.3
 Type: Service Plugin
@@ -6,6 +9,9 @@ Website: www.kiwijs.org
 
 This is a plugin for the LEAP Motion Controller developed by LEAP Motion. 
 For more information about LEAP Motion go to the LEAP motion website here. https://www.leapmotion.com/
+
+Tutorials can be found on the KiwiJS.org website here:
+http://www.kiwijs.org/documentation/tutorials/using-the-leap-motion-controller-plugin/
 
 ----------------------------------------------------------------------------------------
 Files:

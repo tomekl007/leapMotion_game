@@ -87,7 +87,9 @@ To create a controller all you simply need to do is call upon the createControll
 	this.control = Kiwi.Plugins.LEAPController.createController();
 
 Each 'controller' has an array of 'hands' that store all hands that the leap controller is currently detecting. To access these 'Hand' objects and their properties look into the ‘hands’ array of the controller.
+
 	this.control.hands;
+	
 This should return an array of hands that are currently being detected.
 
 Each 'Hand' has an array of 'PointableObjects' that store all fingers of a 'Hand' object that the leap controller is currently detecting. To access these 'PointableObject' and their properties look into the ‘pointables’ array of the 'Hand'.

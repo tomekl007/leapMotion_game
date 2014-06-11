@@ -1,9 +1,36 @@
+/**
+* The Leap Motion Controller Object. Contains name and version number. 
+* 
+* @module Kiwi
+* @submodule Plugins
+* @namespace Kiwi.Plugins
+* @class LEAPController
+*/
+
 Kiwi.Plugins.LEAPController= {
   name:'LEAPController',
   version:'0.1.4'
 };
 Kiwi.PluginManager.register(Kiwi.Plugins.LEAPController);
 
+/**
+*A Kiwi Plugin GameObject that allows use of Leap Motion Controller in Kiwi.js.
+*
+*By default, the LEAPController plugin is capable of tracking multiple hands and corresponding fingers.
+*A LEAPController should be added at the start of a scene.
+*
+* @class InventoryManager
+* @extends Entity
+* @namespace Kiwi.Plugins.Inventory
+* @constructor
+*/
+
+
+/**
+* A method that creates a new object type for the finger(Or pointable) of a hand.
+* @method PointableObject
+* @public
+*/
 Kiwi.Plugins.LEAPController.PointableObject = function(){
   
   this.active = false;
@@ -27,7 +54,11 @@ Kiwi.Plugins.LEAPController.PointableObject = function(){
 
 
 
-
+/**
+* A method that creates a new object type for a hand.
+* @method PointableObject
+* @public
+*/
 Kiwi.Plugins.LEAPController.HandObject = function(){
 
   //position
@@ -78,7 +109,13 @@ Kiwi.Plugins.LEAPController.onDisconnect = new Kiwi.Signal();
 
 
 
-
+/**
+* A method that creates an Leap.Controller object.
+* The controller automatically updates itself with data from current hands and pointables in view.
+* @method createController
+* @param game {Kiwi.Game} The Kiwi.Game that the controller will be created for
+* @public
+*/
 Kiwi.Plugins.LEAPController.createController = function(game) {
     //Create Controller
     this.leapControl = new Leap.Controller({enableGestures: true});

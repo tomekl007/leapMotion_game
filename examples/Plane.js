@@ -33,6 +33,8 @@ myState.create = function(){
 	this.airplaneMissileGroup = new Kiwi.Group(this);
 	this.explodeGroup = new Kiwi.Group(this);
 
+    this.bonuses = new Kiwi.Group(this);
+
 
 	///////////////////
 	//Plane and Bomb Door
@@ -44,6 +46,10 @@ myState.create = function(){
 	//Timers for enemy spawns
 	this.timer = this.game.time.clock.createTimer('spawnTroop', .3, -1, true);
 	this.timerEvent = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnMissile, this);
+
+    //timers for bonuses
+    //this.timer2 = this.game.time.clock.createTimer("spawnBonus",3, -1, true);
+    this.timerEvent2 = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnBonus, this);
 	//this.timerEvent = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnAirplaneMissile, this);
 
 
@@ -83,6 +89,7 @@ myState.create = function(){
     this.addChild(this.bg1);
 
     //
+    this.addChild(this.bonuses);
     this.addChild(this.missileGroup);
     this.addChild(this.airplaneMissileGroup);
     this.addChild(this.plane);
@@ -107,6 +114,10 @@ myState.update = function(){
 	//console.log(this.control.hands[0].pointables[0]);
 //	console.log(this.control.hands[0])
 	//console.log(this.control);
+
+   /* console.log("roll : " + this.control.hands[0].roll);
+    console.log("pitch " + this.control.hands[0].pitch);
+    console.log(" yaw " + this.control.hands[0].yaw);*/
 
 	var currentX = this.control.hands[0].pointables[1]["tipX"];
 
@@ -235,12 +246,19 @@ function isOverlapping(plane) {
 }
 
 myState.spawnMissile = function(){
-	if(this.control.controllerConnected){
-	var s = new EnemyMissile(this, this.game.stage.width + 50, Math.random() * 450);
-	this.missileGroup.addChild(s);
-}
+	    if(this.control.controllerConnected){
+	    var s = new EnemyMissile(this, this.game.stage.width + 50, Math.random() * 450);
+	    this.missileGroup.addChild(s);
+    }
 
-}
+};
+
+myState.spawnBonus = function(){
+    if(this.control.controllerConnected){
+        var s = new Bonus(this, 0, 0);
+        this.bonuses.addChild(s);
+    }
+};
 
 
 
@@ -332,6 +350,40 @@ var Airplane = function(state, x, y){
 	}
 }
 Kiwi.extend(Airplane,Kiwi.GameObjects.Sprite);
+
+
+
+
+var Bonus =  function (state, x, y){
+    Kiwi.GameObjects.Sprite.call(this, state, state.textures['bomb'], x, y);
+
+    this.animation.add('walk', [0,1], 0.1, true);
+    this.animation.play('walk');
+
+    //this.box.hitbox = new Kiwi.Geom.Rectangle(50, 34, 50, 84);
+    this.physics = this.components.add(new Kiwi.Components.ArcadePhysics(this, this.box));
+    this.health = 1;
+    this.scaleX = 1;
+
+    EnemyMissile.prototype.update = function(){
+
+        Kiwi.GameObjects.Sprite.prototype.update.call(this);
+        this.physics.update();
+
+
+        this.y += 7;
+
+
+        if(this.health <= 0){
+            this.destroy();
+        }
+
+        if (this.y > 1000){
+            this.destroy();
+        }
+    }
+}
+Kiwi.extend(Bonus,Kiwi.GameObjects.Sprite);
 
 
 var Platform = function (state, x, y){
@@ -475,13 +527,14 @@ loadingState.preload = function(){
 	this.addImage('bg5', 'assets/bg-layers/5.png');
 	this.addImage('bg6', 'assets/bg-layers/6.png');
 	this.addImage('bg7', 'assets/bg-layers/7.png');
-	this.addImage('pauseImage', 'assets/pauseImage.png')
-	///////////////////////////////////
+	this.addImage('pauseImage', 'assets/pauseImage.png');
+    ///////////////////////////////////
 	//SpriteSheet and Objects
 	this.addSpriteSheet('plane', 'assets/plane.png', 166, 83);
 	this.addSpriteSheet('explosion', 'assets/explosion.png', 129, 133);
 	this.addSpriteSheet('missile', 'assets/rocket.png', 62, 26);
     this.addSpriteSheet('airplaneMissile', 'assets/rocket_2.png', 47, 20);
+    this.addImage('bomb','assets/bomb.png', 50, 50);
 
 }
 loadingState.update = function(){

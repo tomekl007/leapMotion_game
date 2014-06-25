@@ -103,9 +103,10 @@ myState.update = function(){
 		this.control.update();
 		this.plane.x = (this.control.hands[0].posX* 1.7) + 400;
 		this.plane.y =((-1 * this.control.hands[0].posY)*1.7) + 600;
+        this.plane.z =(this.control.hands[0].posZ* 1.7) + 400;
 
-	// this.plane.scaleX = this.control.hands[0].posZ /250;
-	// this.plane.scaleY = this.control.hands[0].posZ / 250;
+	 this.plane.scaleX = this.control.hands[0].posZ /250;
+	 this.plane.scaleY = this.control.hands[0].posZ / 250;
 
 	// this.plane.rotation = -1 * (this.control.hands[0].palmNormalX);
 

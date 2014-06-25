@@ -91,6 +91,11 @@ myState.create = function(){
 
 
 }
+
+var currentX = [];
+var firemove = false;
+var firemoveEnd = false;
+
 myState.update = function(){
 	Kiwi.State.prototype.update.call(this);
 //	console.log(this.control.hands[0].pointables[0].touchZone);
@@ -99,17 +104,37 @@ myState.update = function(){
 	//console.log(this.control.hands[0].pointables[0]);
 //	console.log(this.control.hands[0])
 	//console.log(this.control);
+
+	var currentX = this.control.hands[0].pointables[1]["tipX"];
+
+	if ( currentX > 0 && !firemove){
+		console.log("first");
+		firemove = true;
+	}
+
+	else if( currentX < 0 && firemove){
+		console.log("second");
+		firemoveEnd = true;
+	}
+	else if ( currentX > 0 && firemoveEnd && firemove){
+		console.log("third");
+		startFire();
+		firemove = false;
+		firemoveEnd = false;
+	}
+
     /*this.control.hands[0].pointables.forEach( function(value, index) {
-    	console.log("finger number :  " + index + " value X: " +  value.tipX )//+ " value Y : " + value.tipY); //JSON.stringify(value));
-    });
-*/
+    	console.log("finger number :  " +
+    	index + " value X: " + value["tipX"]);
+    });*/
+
 
 	if(this.control.controllerConnected){
 		//console.log("ControllerConnected");
 		this.pauseImage.alpha = 0;
 
 		this.control.update();
-		console.log("plane.z "  + this.control.hands[0].posZ);
+		//console.log("plane.z "  + this.control.hands[0].posZ);
 
 		this.plane.x = (this.control.hands[0].posX* 1.7) + 400;
 		this.plane.y =((-1 * this.control.hands[0].posY)*1.7) + 600;
@@ -119,12 +144,12 @@ myState.update = function(){
 	 this.plane.scaleY = this.control.hands[0].posZ / 250;
 
 	 if( this.control.hands[0].posZ < 60 ){
-			console.log("smaller that " + 60);
+		//	console.log("smaller that " + 60);
 			//this.plane.z = (60 * 1.7 ) + 400;
 			this.plane.scaleX = 0.25;
 			this.plane.scaleY = 0.25;
 		}
-	 console.log("scaleX : " + this.plane.scaleX );
+	 //console.log("scaleX : " + this.plane.scaleX );
 
 	// this.plane.rotation = -1 * (this.control.hands[0].palmNormalX);
 
@@ -143,6 +168,10 @@ myState.update = function(){
 
 }
 
+function startFire(){
+	console.log("FIRE");
+}
+
 
 
 
@@ -152,7 +181,7 @@ myState.checkMissiles = function(){
 	var missiles = this.missileGroup.members;
 
 		for (var j = 0; j < missiles.length; j++){ //collides with enemy
-			if(this.plane.physics.overlaps(missiles[j])){
+			if(this.plane.physics.overlaps(missiles[j]) && isOverlapping(this.plane)){
 				missiles[j].health --;
 				this.explodeGroup.addChild(new Explosion(this, missiles[j].x -30, missiles[j].y-70));
 				missiles[j].destroy();
@@ -163,6 +192,15 @@ myState.checkMissiles = function(){
 				break;
 			}
 		}
+}
+
+function isOverlapping(plane) {
+	//console.log(plane.scaleX);
+	if(plane.scaleX > 0.85 || plane.scaleX < 0.30){
+		return false;
+	}
+	//console.log(obstacle.scaleX);
+	return true;
 }
 
 myState.spawnMissile = function(){
@@ -389,7 +427,7 @@ loadingState.update = function(){
 
 loadingState.create = function(){
     Kiwi.State.prototype.create.call(this);
-    console.log("inside create of loadingState");
+    //console.log("inside create of loadingState");
     this.tweenOut = this.game.tweens.create(this.logo);
     this.tweenOut.to({alpha: 0}, 1000, Kiwi.Animations.Tweens.Easing.Linear.None, false);
     this.tweenOut.onComplete(this.switchToMain, this);

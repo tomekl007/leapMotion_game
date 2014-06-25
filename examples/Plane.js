@@ -45,11 +45,14 @@ myState.create = function(){
 	/////////////////////////
 	//Timers for enemy spawns
 	this.timer = this.game.time.clock.createTimer('spawnTroop', .3, -1, true);
-	this.timerEvent = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnMissile, this);
+
 
     //timers for bonuses
     //this.timer2 = this.game.time.clock.createTimer("spawnBonus",3, -1, true);
     this.timerEvent2 = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnBonus, this);
+    this.timerEvent = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnMissile, this);
+
+
 	//this.timerEvent = this.timer.createTimerEvent(Kiwi.Time.TimerEvent.TIMER_COUNT, this.spawnAirplaneMissile, this);
 
 
@@ -195,9 +198,20 @@ function startFire(){
 
 myState.checkMissiles = function(){
     var airplaneMissiles = this.airplaneMissileGroup.members;
-	var bombs = this.bombGroup.members;
+	var bombs = this.bonuses.members;
 	var missiles = this.missileGroup.members;
     var self = this;
+
+    bombs.forEach( function ( bomb ){
+        console.log("bomb : " + bomb);
+        if( self.plane.physics.overlaps(bomb)){
+            console.log("plane overlaps bomb");
+           bomb.health --;
+           bomb.destroy();
+        }
+    });
+
+
     airplaneMissiles.forEach( function ( airplaneMissile ) {
         missiles.forEach( function ( enemyMissile ) {
             if(airplaneMissile.physics.overlaps(enemyMissile)){
@@ -253,10 +267,16 @@ myState.spawnMissile = function(){
 
 };
 
+
+
 myState.spawnBonus = function(){
+    var randomBombX = [this.game.stage.width / 2, this.game.stage.width * 0.3, this.game.stage.width * 0.8]
     if(this.control.controllerConnected){
-        var s = new Bonus(this, 0, 0);
-        this.bonuses.addChild(s);
+        var randomIndex = parseInt(Math.random() *100 % 3) ;
+        var s = new Bonus(this, randomBombX[randomIndex], 0);
+        if(this.bonuses.members.length == 0  ) {
+           this.bonuses.addChild(s)
+         }
     }
 };
 
@@ -365,20 +385,20 @@ var Bonus =  function (state, x, y){
     this.health = 1;
     this.scaleX = 1;
 
-    EnemyMissile.prototype.update = function(){
+    Bonus.prototype.update = function(){
 
         Kiwi.GameObjects.Sprite.prototype.update.call(this);
         this.physics.update();
 
 
-        this.y += 7;
+        this.y += 4;
 
 
         if(this.health <= 0){
             this.destroy();
         }
 
-        if (this.y > 1000){
+        if (this.y > 900){
             this.destroy();
         }
     }
@@ -534,7 +554,7 @@ loadingState.preload = function(){
 	this.addSpriteSheet('explosion', 'assets/explosion.png', 129, 133);
 	this.addSpriteSheet('missile', 'assets/rocket.png', 62, 26);
     this.addSpriteSheet('airplaneMissile', 'assets/rocket_2.png', 47, 20);
-    this.addImage('bomb','assets/bomb.png', 50, 50);
+    this.addSpriteSheet('bomb','assets/bomb.png', 50, 50);
 
 }
 loadingState.update = function(){

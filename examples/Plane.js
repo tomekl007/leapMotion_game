@@ -94,7 +94,7 @@ myState.create = function(){
 myState.update = function(){
 	Kiwi.State.prototype.update.call(this);
 //	console.log(this.control.hands[0].pointables[0].touchZone);
-	console.log(this.control.hands[0].pointables[0].touchDistance);
+	//console.log(this.control.hands[0].pointables[0].touchDistance);
 	//console.log(this.control.hands[1])
 	//console.log(this.control.hands[0].pointables[0]);
 //	console.log(this.control.hands[0])
@@ -108,14 +108,23 @@ myState.update = function(){
 		//console.log("ControllerConnected");
 		this.pauseImage.alpha = 0;
 
-
 		this.control.update();
+		console.log("plane.z "  + this.control.hands[0].posZ);
+
 		this.plane.x = (this.control.hands[0].posX* 1.7) + 400;
 		this.plane.y =((-1 * this.control.hands[0].posY)*1.7) + 600;
-        this.plane.z =(this.control.hands[0].posZ* 1.7) + 400;
+
 
 	 this.plane.scaleX = this.control.hands[0].posZ /250;
 	 this.plane.scaleY = this.control.hands[0].posZ / 250;
+
+	 if( this.control.hands[0].posZ < 60 ){
+			console.log("smaller that " + 60);
+			//this.plane.z = (60 * 1.7 ) + 400;
+			this.plane.scaleX = 0.25;
+			this.plane.scaleY = 0.25;
+		}
+	 console.log("scaleX : " + this.plane.scaleX );
 
 	// this.plane.rotation = -1 * (this.control.hands[0].palmNormalX);
 

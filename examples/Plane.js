@@ -169,7 +169,7 @@ myState.update = function(){
 
 
 
-}
+};
 
 function startFire(){
 	console.log("FIRE");
@@ -186,6 +186,22 @@ myState.checkMissiles = function(){
     var airplaneMissiles = this.airplaneMissileGroup.members;
 	var bombs = this.bombGroup.members;
 	var missiles = this.missileGroup.members;
+    var self = this;
+    airplaneMissiles.forEach( function ( airplaneMissile ) {
+        missiles.forEach( function ( enemyMissile ) {
+            if(airplaneMissile.physics.overlaps(enemyMissile)){
+                airplaneMissile.health --;
+                enemyMissile.health --;
+
+                self.explodeGroup.addChild(new Explosion(self, enemyMissile.x -30, enemyMissile.y-70));
+                enemyMissile.destroy();
+                airplaneMissile.destroy();
+            }
+
+        });
+
+    });
+
     	for (var j = 0; j < missiles.length; j++){ //collides with enemy
 			if(this.plane.physics.overlaps(missiles[j]) && isOverlapping(this.plane)){
 				missiles[j].health --;
@@ -204,7 +220,7 @@ myState.checkMissiles = function(){
 myState.spawnAirplaneMissile = function  (){
 	if(this.control.controllerConnected){
 		console.log("spawnAirplaneMissile")
-		var s = new AirplaneMissile(this, 0, 0);//todo airplane
+		var s = new AirplaneMissile(this, this.plane.x + 10, this.plane.y + 20);//todo airplane
 		this.airplaneMissileGroup.addChild(s);
 	}
 }
@@ -348,7 +364,7 @@ var EnemyMissile = function (state, x, y){
 		this.physics.update();
 
 
-		this.x -= 10;
+		this.x -= 7;
 
 
 		if(this.health <= 0){

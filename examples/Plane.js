@@ -214,7 +214,6 @@ myState.update = function(){
                 armagedonStarted = false;
                 bonusCollected = false;
 
-                console.dir(self.bonusCollectedInfo);
                 self.missileGroup.members = [];
                 self.bonusCollectedInfo.members = [];
             });
@@ -330,7 +329,8 @@ myState.checkMissiles = function(){
 
                 if ( this.plane.health < 1 ) {
                     this.explodeGroup.addChild(new Explosion(this, this.plane[j].x -30, this.plane[j].y-70));
-                    this.plane.destroy();
+                    missiles.members = [];
+                    //this.plane.destroy();
                 }
 				break;
 			}

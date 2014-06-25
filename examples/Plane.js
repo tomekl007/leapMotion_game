@@ -5,14 +5,14 @@ var preloader = new Kiwi.State('preloader');
 
 myState.preload = function(){
 	Kiwi.State.prototype.preload.call(this);
-	
+
 }
 
 myState.create = function(){
 
 	this.control = Kiwi.Plugins.LEAPController.createController();
 
-	this.ground = new Platform(this, 0, 505);	
+	this.ground = new Platform(this, 0, 505);
 
 	this.bombGroup = new Kiwi.Group(this);
 
@@ -28,17 +28,17 @@ myState.create = function(){
 	this.bg7 = new Kiwi.Group(this);
 
 	this.bombDropped = false;
-	
+
 	this.missileGroup = new Kiwi.Group(this);
 	this.explodeGroup = new Kiwi.Group(this);
-	
+
 
 	///////////////////
 	//Plane and Bomb Door
 	this.plane = new Airplane(this,this.textures['plane'], 250, 20);
-	
 
-	
+
+
 	/////////////////////////
 	//Timers for enemy spawns
 	this.timer = this.game.time.clock.createTimer('spawnTroop', .3, -1, true);
@@ -49,7 +49,7 @@ myState.create = function(){
 
 
   	////////////////////////
-  	//Creating parallax bacground assets  
+  	//Creating parallax bacground assets
     for(var i = 0; i < 20; i++){//grass
     	this.grassGroup.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['grass'], i * 48, 504, true));
     	this.grassGroup.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['dirt'], i * 48, 552, true));
@@ -57,19 +57,19 @@ myState.create = function(){
     }
     for(var i = 0; i < 4; i++){
     	this.bg7.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg7'], i*434, 0, true));//bg7
-    }    
+    }
     for(var i = 0; i < 5; i++){
     	this.bg6.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg6'], i*346, 185, true));//bg6
-    }    
+    }
     for(var i = 0; i < 10; i++){
     	this.bg5.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg5'], i*96, 253, true));//bg5
     	this.bg4.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg4'], i*96, 279, true));//bg4
-    }    
+    }
     for(var i = 0; i < 3; i++){
     	this.bg3.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg3'], i*460, 305, true));//bg3
     	this.bg2.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg2'], i*460, 335, true));//bg2
     	this.bg1.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bg1'], i*460, 381, true));//bg1
-    } 
+    }
     //Background
     this.addChild(this.ground);
     this.addChild(this.bg7);
@@ -88,12 +88,21 @@ myState.create = function(){
     //Foreground
     this.addChild(this.grassGroup);
     this.addChild(this.pauseImage);
-    
+
 
 }
 myState.update = function(){
 	Kiwi.State.prototype.update.call(this);
-	console.log(this.control.hands[0].posY);
+//	console.log(this.control.hands[0].pointables[0].touchZone);
+	console.log(this.control.hands[0].pointables[0].touchDistance);
+	//console.log(this.control.hands[1])
+	//console.log(this.control.hands[0].pointables[0]);
+//	console.log(this.control.hands[0])
+	//console.log(this.control);
+    /*this.control.hands[0].pointables.forEach( function(value, index) {
+    	console.log("finger number :  " + index + " value X: " +  value.tipX )//+ " value Y : " + value.tipY); //JSON.stringify(value));
+    });
+*/
 
 	if(this.control.controllerConnected){
 		//console.log("ControllerConnected");
@@ -164,28 +173,28 @@ myState.spawnMissile = function(){
 myState.updateParallax = function(){
 	//Ground
 	for(var i =0; i < this.grassGroup.members.length;i++){
-		this.grassGroup.members[i].transform.x -= 6;		
+		this.grassGroup.members[i].transform.x -= 6;
 		if(this.grassGroup.members[i].transform.worldX <= -48){
 			this.grassGroup.members[i].transform.x = 48*19;
 		}
 	}
 	//bg1
 	for(var i =0; i < this.bg1.members.length;i++){
-		this.bg1.members[i].transform.x -= 6;		
+		this.bg1.members[i].transform.x -= 6;
 		if(this.bg1.members[i].transform.worldX <= -460){
 			this.bg1.members[i].transform.x = 460* (this.bg1.members.length - 1) ;
 		}
 	}
 	//bg2
 	for(var i =0; i < this.bg2.members.length;i++){
-		this.bg2.members[i].transform.x -= 4;		
+		this.bg2.members[i].transform.x -= 4;
 		if(this.bg2.members[i].transform.worldX <= -460){
 			this.bg2.members[i].transform.x = 460*(this.bg2.members.length - 1);
 		}
 	}
 	//bg3
 	for(var i =0; i < this.bg3.members.length;i++){
-		this.bg3.members[i].transform.x -= 3;		
+		this.bg3.members[i].transform.x -= 3;
 		if(this.bg3.members[i].transform.worldX <= -460){
 			this.bg3.members[i].transform.x = 460*(this.bg3.members.length - 1);
 		}
@@ -199,15 +208,15 @@ myState.updateParallax = function(){
 	}
 	//bg5
 	for(var i =0; i < this.bg4.members.length;i++){
-		this.bg5.members[i].transform.x -= 0.5;		
+		this.bg5.members[i].transform.x -= 0.5;
 		if(this.bg5.members[i].transform.worldX <= -96){
 			this.bg5.members[i].transform.x = 96*(this.bg5.members.length - 1);
 		}
 	}
-	
+
 	//bg7
 	for(var i =0; i < this.bg7.members.length;i++){
-		this.bg7.members[i].transform.x -= .25;		
+		this.bg7.members[i].transform.x -= .25;
 		if(this.bg7.members[i].transform.worldX <= -434){
 			this.bg7.members[i].transform.x = 434*(this.bg7.members.length - 1);
 		}
@@ -232,7 +241,7 @@ var Airplane = function(state, x, y){
 	//this.box.hitbox = new Kiwi.Geom.Rectangle(30, 80, 130, 40);
 	this.physics = this.components.add(new Kiwi.Components.ArcadePhysics(this, this.box));
 
-	this.animation.add('walk', [0,1], 0.1, true);    
+	this.animation.add('walk', [0,1], 0.1, true);
 	this.animation.play('walk');
 
 
@@ -241,7 +250,7 @@ var Airplane = function(state, x, y){
 		Kiwi.GameObjects.Sprite.prototype.update.call(this);
 		//Update ArcadePhysics
 		this.physics.update();
-	}	
+	}
 }
 Kiwi.extend(Airplane,Kiwi.GameObjects.Sprite);
 
@@ -262,10 +271,10 @@ Kiwi.extend(Platform,Kiwi.GameObjects.Sprite);
 var EnemyMissile = function (state, x, y){
 	Kiwi.GameObjects.Sprite.call(this, state, state.textures['missile'], x, y);
 
-	this.animation.add('walk', [0,1], 0.1, true);    
+	this.animation.add('walk', [0,1], 0.1, true);
 	this.animation.play('walk');
 
-	//this.box.hitbox = new Kiwi.Geom.Rectangle(50, 34, 50, 84);	
+	//this.box.hitbox = new Kiwi.Geom.Rectangle(50, 34, 50, 84);
 	this.physics = this.components.add(new Kiwi.Components.ArcadePhysics(this, this.box));
 	this.health = 1;
 	this.scaleX = 1;
@@ -276,7 +285,7 @@ var EnemyMissile = function (state, x, y){
 
 
 		this.x -= 10;
-		
+
 
 		if(this.health <= 0){
 			this.destroy();
@@ -296,7 +305,7 @@ Kiwi.extend(EnemyMissile,Kiwi.GameObjects.Sprite);
 
 var Explosion = function (state, x, y){
 	Kiwi.GameObjects.Sprite.call(this, state, state.textures['explosion'], x, y);
-	this.animation.add('explode', [0, 1, 2, 3, 4], 0.1, false);    
+	this.animation.add('explode', [0, 1, 2, 3, 4], 0.1, false);
 	this.animation.play('explode');
 
 	Explosion.prototype.update = function(){
@@ -329,9 +338,9 @@ loadingState.preload = function(){
     Kiwi.State.prototype.preload.call(this);
     this.game.states.rebuildLibraries();
     this.game.stage.color = '#E0EDF1';
-    
+
     this.logo = new Kiwi.GameObjects.StaticImage(this, this.textures['loadingImage'], 150, 50);
-    
+
     this.addChild(this.logo);
 
     this.logo.alpha = 0;

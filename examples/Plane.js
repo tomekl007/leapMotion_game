@@ -27,6 +27,9 @@ myState.create = function(){
 	this.bg6 = new Kiwi.Group(this);
 	this.bg7 = new Kiwi.Group(this);
 
+
+    this.bonusCollectedInfo = new Kiwi.Group(this);
+
 	this.bombDropped = false;
 
 	this.missileGroup = new Kiwi.Group(this);
@@ -98,6 +101,7 @@ myState.create = function(){
     this.addChild(this.plane);
     this.addChild(this.explodeGroup);
 
+    this.addChild(this.bonusCollectedInfo);
     //Foreground
     this.addChild(this.grassGroup);
     this.addChild(this.pauseImage);
@@ -108,6 +112,7 @@ myState.create = function(){
 var currentX = [];
 var firemove = false;
 var firemoveEnd = false;
+var armagedonStarted = false;
 
 myState.update = function(){
 	Kiwi.State.prototype.update.call(this);
@@ -175,6 +180,38 @@ myState.update = function(){
 		this.game.input.reset();
 	}
 
+
+        var bombSprite = new Kiwi.GameObjects.Sprite(this, this.textures['armageddon'], 20, 20  , true)
+    if( bonusCollected ){
+        this.bonusCollectedInfo.addChild(bombSprite);
+    }
+
+    if( bonusCollected ){
+        var roll = this.control.hands[0].roll;
+        console.log("roll " + roll);
+        if( roll > 1.3 ){
+            armagedonStarted = true;
+        }
+
+        if( armagedonStarted && roll < -2){
+
+            var self = this;
+            var missiles = this.missileGroup.members;
+
+            missiles.forEach( function ( enemyMissile ) {
+                    enemyMissile.health --;
+
+                    self.explodeGroup.addChild(new Explosion(self, enemyMissile.x -30, enemyMissile.y-70));
+                    enemyMissile.destroy();
+                armagedonStarted = false;
+                bonusCollected = false;
+                console.dir(self.bonusCollectedInfo);
+                self.bonusCollectedInfo.members = [];
+            });
+        }
+    }
+
+
 	this.updateParallax();
 	this.checkMissiles();
 } else {
@@ -195,6 +232,7 @@ function startFire(){
 
 
 
+var bonusCollected = false;
 
 myState.checkMissiles = function(){
     var airplaneMissiles = this.airplaneMissileGroup.members;
@@ -203,11 +241,13 @@ myState.checkMissiles = function(){
     var self = this;
 
     bombs.forEach( function ( bomb ){
-        console.log("bomb : " + bomb);
+        //console.log("bomb : " + bomb);
         if( self.plane.physics.overlaps(bomb)){
             console.log("plane overlaps bomb");
            bomb.health --;
            bomb.destroy();
+           bonusCollected = true;
+
         }
     });
 
@@ -555,6 +595,7 @@ loadingState.preload = function(){
 	this.addSpriteSheet('missile', 'assets/rocket.png', 62, 26);
     this.addSpriteSheet('airplaneMissile', 'assets/rocket_2.png', 47, 20);
     this.addSpriteSheet('bomb','assets/bomb.png', 50, 50);
+    this.addSpriteSheet('armageddon','assets/armageddon.png', 50, 50);
 
 }
 loadingState.update = function(){

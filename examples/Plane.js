@@ -38,6 +38,8 @@ myState.create = function(){
 
     this.bonuses = new Kiwi.Group(this);
 
+    this.healthBar = new Kiwi.Group(this);
+
 
 	///////////////////
 	//Plane and Bomb Door
@@ -102,6 +104,8 @@ myState.create = function(){
     this.addChild(this.explodeGroup);
 
     this.addChild(this.bonusCollectedInfo);
+
+    this.addChild(this.healthBar);
     //Foreground
     this.addChild(this.grassGroup);
     this.addChild(this.pauseImage);
@@ -113,6 +117,8 @@ var currentX = [];
 var firemove = false;
 var firemoveEnd = false;
 var armagedonStarted = false;
+var textSet = false;
+var text1;
 
 myState.update = function(){
 	Kiwi.State.prototype.update.call(this);
@@ -130,16 +136,16 @@ myState.update = function(){
 	var currentX = this.control.hands[0].pointables[1]["tipX"];
 
 	if ( currentX > 0 && !firemove){
-		console.log("first");
+	//	console.log("first");
 		firemove = true;
 	}
 
 	else if( currentX < 0 && firemove){
-		console.log("second");
+		//console.log("second");
 		firemoveEnd = true;
 	}
 	else if ( currentX > 0 && firemoveEnd && firemove){
-		console.log("third");
+		//console.log("third");
 		this.spawnAirplaneMissile();
 		firemove = false;
 		firemoveEnd = false;
@@ -181,14 +187,15 @@ myState.update = function(){
 	}
 
 
-        var bombSprite = new Kiwi.GameObjects.Sprite(this, this.textures['armageddon'], 20, 20  , true)
+    var bombSprite = new Kiwi.GameObjects.Sprite(this, this.textures['armageddon'], 20, 20  , true);
+
     if( bonusCollected ){
         this.bonusCollectedInfo.addChild(bombSprite);
     }
 
     if( bonusCollected ){
         var roll = this.control.hands[0].roll;
-        console.log("roll " + roll);
+        //console.log("roll " + roll);
         if( roll > 1.3 ){
             armagedonStarted = true;
         }
@@ -203,13 +210,58 @@ myState.update = function(){
 
                     self.explodeGroup.addChild(new Explosion(self, enemyMissile.x -30, enemyMissile.y-70));
                     enemyMissile.destroy();
+
                 armagedonStarted = false;
                 bonusCollected = false;
+
                 console.dir(self.bonusCollectedInfo);
+                self.missileGroup.members = [];
                 self.bonusCollectedInfo.members = [];
             });
+            self.plane.points += 10;
         }
     }
+
+        console.dir(this.members);
+        //this.members = [];
+
+        if( !textSet ){
+            text1 = new Kiwi.GameObjects.Textfield(this, 'You have ' + this.plane.points + ' points ', 10, 10, '#000');
+            this.addChild(text1);
+            textSet = true;
+        }else {
+            text1.text = 'You have ' + this.plane.points + ' points ';
+        }
+
+
+
+
+    var planeHealth = this.plane.health;
+    if ( planeHealth == 10 || planeHealth == 9){
+        this.healthBar.members = [];
+        this.healthBar.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bar5'], 620, 20 , true));
+    }else if ( planeHealth == 8 || planeHealth == 7) {
+        this.healthBar.members = [];
+        this.healthBar.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bar4'], 620, 20 , true));
+
+    }else if ( planeHealth == 5 || planeHealth == 6){
+        this.healthBar.members = [];
+        this.healthBar.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bar3'], 620, 20 , true));
+    }else if ( planeHealth == 4 || planeHealth == 3){
+        this.healthBar.members = [];
+        this.healthBar.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bar2'], 620, 20 , true));
+
+    }else if ( planeHealth == 1 || planeHealth == 2){
+        this.healthBar.members = [];
+        this.healthBar.addChild(new Kiwi.GameObjects.Sprite(this, this.textures['bar1'], 620, 20 , true));
+     }
+
+
+
+
+
+
+
 
 
 	this.updateParallax();
@@ -243,7 +295,7 @@ myState.checkMissiles = function(){
     bombs.forEach( function ( bomb ){
         //console.log("bomb : " + bomb);
         if( self.plane.physics.overlaps(bomb)){
-            console.log("plane overlaps bomb");
+           // console.log("plane overlaps bomb");
            bomb.health --;
            bomb.destroy();
            bonusCollected = true;
@@ -261,7 +313,9 @@ myState.checkMissiles = function(){
                 self.explodeGroup.addChild(new Explosion(self, enemyMissile.x -30, enemyMissile.y-70));
                 enemyMissile.destroy();
                 airplaneMissile.destroy();
+                self.plane.points ++;
             }
+            console.log("points : " + self.plane.points);
 
         });
 
@@ -270,8 +324,14 @@ myState.checkMissiles = function(){
     	for (var j = 0; j < missiles.length; j++){ //collides with enemy
 			if(this.plane.physics.overlaps(missiles[j]) && isOverlapping(this.plane)){
 				missiles[j].health --;
+                this.plane.health --;
 				this.explodeGroup.addChild(new Explosion(this, missiles[j].x -30, missiles[j].y-70));
-				missiles[j].destroy();
+                missiles[j].destroy();
+
+                if ( this.plane.health < 1 ) {
+                    this.explodeGroup.addChild(new Explosion(this, this.plane[j].x -30, this.plane[j].y-70));
+                    this.plane.destroy();
+                }
 				break;
 			}
 			if(missiles[j].x < -200){
@@ -284,7 +344,7 @@ myState.checkMissiles = function(){
 
 myState.spawnAirplaneMissile = function  (){
 	if(this.control.controllerConnected){
-		console.log("spawnAirplaneMissile")
+	//	console.log("spawnAirplaneMissile")
 		var s = new AirplaneMissile(this, this.plane.x + 10, this.plane.y + 20);//todo airplane
 		this.airplaneMissileGroup.addChild(s);
 	}
@@ -301,9 +361,12 @@ function isOverlapping(plane) {
 
 myState.spawnMissile = function(){
 	    if(this.control.controllerConnected){
-	    var s = new EnemyMissile(this, this.game.stage.width + 50, Math.random() * 450);
-	    this.missileGroup.addChild(s);
-    }
+            if(this.missileGroup.members.length < 10 ){
+	            var s = new EnemyMissile(this, this.game.stage.width + 50, Math.random() * 450);
+	            this.missileGroup.addChild(s);
+            }
+
+        }
 
 };
 
@@ -400,6 +463,8 @@ var Airplane = function(state, x, y){
 
 	this.animation.add('walk', [0,1], 0.1, true);
 	this.animation.play('walk');
+    this.health = 10;
+    this.points = 0;
 
 
 
@@ -408,7 +473,7 @@ var Airplane = function(state, x, y){
 		//Update ArcadePhysics
 		this.physics.update();
 	}
-}
+};
 Kiwi.extend(Airplane,Kiwi.GameObjects.Sprite);
 
 
@@ -587,7 +652,14 @@ loadingState.preload = function(){
 	this.addImage('bg5', 'assets/bg-layers/5.png');
 	this.addImage('bg6', 'assets/bg-layers/6.png');
 	this.addImage('bg7', 'assets/bg-layers/7.png');
-	this.addImage('pauseImage', 'assets/pauseImage.png');
+    this.addImage('pauseImage', 'assets/pauseImage.png');
+
+    this.addImage('bar1', 'assets/health_bars/1.png')
+    this.addImage('bar2', 'assets/health_bars/2.png')
+    this.addImage('bar3', 'assets/health_bars/3.png')
+    this.addImage('bar4', 'assets/health_bars/4.png')
+    this.addImage('bar5', 'assets/health_bars/5.png')
+
     ///////////////////////////////////
 	//SpriteSheet and Objects
 	this.addSpriteSheet('plane', 'assets/plane.png', 166, 83);
